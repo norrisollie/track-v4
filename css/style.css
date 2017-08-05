@@ -7,18 +7,6 @@ body {
 }
 
 .service-window {
-    /*display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 1;
-    transition: all 0.5s ease;
-    z-index: 100;
-    overflow: scroll;*/
-
     position: fixed;
     top: 0;
     left: 0;
@@ -28,6 +16,7 @@ body {
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     overflow: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 
 .service-window-container {
@@ -229,6 +218,7 @@ body {
     display: flex;
     flex-direction: row;
     overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
     background-color: #FFF;
 }
 

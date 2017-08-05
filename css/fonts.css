@@ -17,14 +17,8 @@
     font-weight: 500;
 }
 
-/*@font-face {
-    font-family: Graphik;
-    src: url(../assets/fonts/graphik-bold.woff);
-    font-weight: 600;*/
-/*}*/
-
 @font-face {
     font-family: Graphik;
-    src: url(../assets/fonts/graphik-black.woff);
+    src: url(../assets/fonts/graphik-semibold.woff);
     font-weight: 600;
 }

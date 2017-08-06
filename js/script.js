@@ -1,7 +1,7 @@
 // scripts
 
 // // change protocol to https if http
-if (window.location.protocol != 'https:') { 
+if (window.location.protocol != 'https:') {
     window.location.protocol = 'https';
 }
 
@@ -28,7 +28,7 @@ window.onload = function() {
             var appID = "adeb06bb",
                 appKey = "6132ab123fadaa1d87d459438a5f5c27",
                 nrKey = "c8eebaa7-d421-4025-bb02-989cc9c53b39",
-                nearestStationsUrl = "https://transportapi.com/v3/uk/train/stations/near.json?app_id=" + appID + "&app_key=" + appKey + "&lat=" + "52.6309" + "&lon=" + "1.2974";
+                nearestStationsUrl = "https://transportapi.com/v3/uk/train/stations/near.json?app_id=" + appID + "&app_key=" + appKey + "&lat=" + lat + "&lon=" + lon;
 
             // empty array for departure urls
             var departuresUrlArray = new Array();
@@ -82,8 +82,6 @@ window.onload = function() {
 
                         // insert stationTemplate element in to resultsWindow element
                         resultsWindow.innerHTML += stationTemplate;
-
-
 
                     }
 
@@ -392,7 +390,7 @@ window.onload = function() {
                 var cancelReason = res.cancelReason;
 
                 // declare service info element
-                    var serviceInfo = document.querySelector(".service-info");
+                var serviceInfo = document.querySelector(".service-info");
 
                 // check if service is cancelled
                 if (serviceCancelled === false) {
@@ -401,7 +399,7 @@ window.onload = function() {
                     console.log("is cancelled");
                 }
 
-                if(delayReason === null && serviceCancelled === false && currentStationEstimated !== "On time") {
+                if (delayReason === null && serviceCancelled === false && currentStationEstimated !== "On time") {
                     console.log("There is no delay reason");
 
                     serviceInfo.innerHTML = "This service has been delayed.";
@@ -496,15 +494,6 @@ window.onload = function() {
         serviceInfoReq.send();
     }
 }
-
-
-
-
-
-
-
-
-
 
 // var request = new XMLHttpRequest();
 // request.open('GET', '/my/url', true);

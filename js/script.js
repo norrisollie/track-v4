@@ -1,7 +1,9 @@
 // scripts
 
 // // change protocol to https if http
-if (window.location.protocol != 'https:') window.location.protocol = 'https';
+if (window.location.protocol != 'https:') { 
+    window.location.protocol = 'https';
+}
 
 // run when page has fully loaded
 window.onload = function() {
@@ -26,7 +28,7 @@ window.onload = function() {
             var appID = "adeb06bb",
                 appKey = "6132ab123fadaa1d87d459438a5f5c27",
                 nrKey = "c8eebaa7-d421-4025-bb02-989cc9c53b39",
-                nearestStationsUrl = "https://transportapi.com/v3/uk/train/stations/near.json?app_id=" + appID + "&app_key=" + appKey + "&lat=" + lat + "&lon=" + lon;
+                nearestStationsUrl = "https://transportapi.com/v3/uk/train/stations/near.json?app_id=" + appID + "&app_key=" + appKey + "&lat=" + "52.6309" + "&lon=" + "1.2974";
 
             // empty array for departure urls
             var departuresUrlArray = new Array();
@@ -71,9 +73,12 @@ window.onload = function() {
                         var stationTemplate =
                             "<div class='station-result'>" +
                             "<div class='station-name-container'>" +
-                            "<span class='station-name'><img class='nr-logo' src='assets/images/nr.svg'>" + name + "</span></div>" +
+                            "<span class='station-name'><img class='nr-logo' src='assets/images/nr.svg'>" + name + "</span>" +
+                            "<div class='location-distance'>This station is <span class='distance'>" + distanceKilometres + "</span> away from your location</div></div>" +
                             "<div class='service-container' data-stationcode=" + code + ">" +
-                            "</div></div>";
+
+                            "</div>" +
+                            "</div>";
 
                         // insert stationTemplate element in to resultsWindow element
                         resultsWindow.innerHTML += stationTemplate;
@@ -122,15 +127,12 @@ window.onload = function() {
                                         serviceIDUrlSafe = data[i].serviceIdUrlSafe,
                                         currentStationCode = res.crs;
 
-
-
                                     // remove null if service via is null
                                     if (serviceVia === null) {
 
                                         // replace with empty string
                                         var serviceVia = "";
                                     }
-
 
                                     // remove null if platform is null
                                     if (platform === null) {
@@ -277,8 +279,8 @@ window.onload = function() {
         // declare target
         var target = e.target;
 
-// var theBody = document.querySelector("body")
-            // theBody.classList.remove("body-no-scroll");
+        // var theBody = document.querySelector("body")
+        // theBody.classList.remove("body-no-scroll");
 
         // if target is closeButton or serviceWindow
         if (target === closeButton || target === serviceWindow) {
@@ -300,8 +302,8 @@ window.onload = function() {
             // nr key
             nrKey = "c8eebaa7-d421-4025-bb02-989cc9c53b39";
 
-            // var theBody = document.querySelector("body")
-            // theBody.classList.add("body-no-scroll");
+        // var theBody = document.querySelector("body")
+        // theBody.classList.add("body-no-scroll");
 
         // log to console
         console.log(target)
@@ -385,6 +387,34 @@ window.onload = function() {
                 var currentStationDepartTime = res.std;
                 var currentStationEstimated = res.etd;
                 var currentStationActualDepartTime = res.atd;
+                var serviceCancelled = res.isCancelled;
+                var delayReason = res.delayReason;
+                var cancelReason = res.cancelReason;
+
+                // declare service info element
+                    var serviceInfo = document.querySelector(".service-info");
+
+                // check if service is cancelled
+                if (serviceCancelled === false) {
+                    console.log("not cancelled")
+                } else if (serviceCancelled !== false) {
+                    console.log("is cancelled");
+                }
+
+                if(delayReason === null && serviceCancelled === false && currentStationEstimated !== "On time") {
+                    console.log("There is no delay reason");
+
+                    serviceInfo.innerHTML = "This service has been delayed.";
+
+                } else if (delayReason !== null & serviceCancelled === false) {
+                    console.log("The reason is: " + delayReason);
+
+                    // insert reason for delay in service info container
+                    serviceInfo.innerHTML = delayReason;
+                } else if (currentStationDepartTime === "On time") {
+
+                    serviceInfo.innerHTML = "There is a good service";
+                }
 
                 // if variable is null
                 if (currentStationEstimated === null) {

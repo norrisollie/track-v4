@@ -6,6 +6,10 @@ body {
     background: linear-gradient(135deg, #FC452B 0, #ff7764 100%);
 }
 
+* {
+	-webkit-font-smoothing: antialiased;
+}
+
 .service-window {
     position: fixed;
     top: 0;
@@ -35,6 +39,12 @@ body {
     padding: 20px;
     margin-bottom: 50px;
     box-sizing: border-box;
+}
+
+.service-info-title {
+	margin: 0 20px 5px; 20px;
+	font-size: 14px;
+	font-weight: 600;
 }
 
 .service-info {
@@ -203,10 +213,35 @@ body {
     width: 100vw;
 }
 
+.station-name {
+	border-bottom: 1px dotted #FFF;
+}
+
+.station-name:hover {
+	cursor: pointer;
+}
+
 .station-name-container {
+	position: relative;
     background-color: #FC452B;
     padding: 5px;
     color: #FFF;
+}
+
+.location-distance {
+	position: absolute;
+	bottom: -15px;
+	font-size: 10px;
+	background-color: #242424;
+	padding: 5px;
+	z-index: 1000;
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.5s ease;
+}
+.station-name:hover~.location-distance {
+    visibility: visible;
+    opacity: 1;
 }
 
 .nr-logo {
@@ -223,7 +258,7 @@ body {
 }
 
 .service-box {
-    padding: 10px;
+    padding: 20px;
     min-width: 250px;
     display: flex;
     flex-direction: column;

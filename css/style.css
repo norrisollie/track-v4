@@ -271,6 +271,11 @@ body {
     cursor: pointer;
 }
 
+.depart-time {
+	font-weight: 500;
+	margin-right: 5px;
+}
+
 .service-row {
     display: flex;
     font-size: 10px;
@@ -347,6 +352,22 @@ body {
     top: 50%;
     right: -5px;
     border-top: 1px solid;
+    border-color: inherit;
+    transform: rotate(-15deg);
+}
+
+.strikethrough-small {
+    position: relative;
+    color: gray;
+}
+
+.strikethrough-small:before {
+    position: absolute;
+    content: "";
+    left: -1px;
+    top: 50%;
+    right: -1px;
+    border-top: 0.5px solid;
     border-color: inherit;
     transform: rotate(-15deg);
 }

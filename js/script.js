@@ -321,205 +321,254 @@ window.onload = function() {
                 // declare response text variable
                 var res = JSON.parse(this.response);
 
-                // enter the previous calling points object
+                // variable to enter the previousCallingPoints object
                 var previousCallingPoints = res.previousCallingPoints;
 
-                // if statement to check whether there are any previous calling points (for services that start at particular station-result)
+                // new array to contain all the calling points for each service
+                var callingPointsArray = new Array();
+
+                // check to see whether previousCallingPoints object exists
+                // if previousCallingPoints does not exist
                 if (previousCallingPoints === null) {
 
                     // create an empty string
                     var previousCallingPoints = "";
 
-                    // if previous calling points do exist (not null)
+                    // if previousCallingPoints object exists
                 } else if (previousCallingPoints !== null) {
 
-                    // declare variable to enter object for previous calling points
-                    var previousCallingPoints = res.previousCallingPoints[0].callingPoint;
+                    // variable to enter the previousCallingPoints object and array
+                    var previousCallingPoints = previousCallingPoints[0].callingPoint;
+
                 }
 
-                // create variables for information in array
+                // variable to enter the subsequentCallingPoints object
                 var subsequentCallingPoints = res.subsequentCallingPoints[0].callingPoint;
+
                 var destinationStation = res.subsequentCallingPoints[0].callingPoint.slice(-1)[0];
                 var destinationStationCode = destinationStation.crs;
                 var destinationStationName = destinationStation.locationName;
 
-                // declare variables for required elements
-                var currentStationElement = document.querySelector(".current-station");
-                var destinationStationElement = document.querySelector(".destination-station");
-                var currentStationFullElement = document.querySelector(".current-station-full");
-                var destinationStationFullElement = document.querySelector(".destination-station-full");
-                var callingPointsContainer = document.querySelector(".calling-points-container");
-
-                // create new array to contain all calling point elements
-                var callingPointsArr = new Array();
-
-                //loop to go through calling points
+                // loop through the previousCallingPoints object
                 for (var i = 0; i < previousCallingPoints.length; i++) {
 
-                    // 
-                    var previousCallingPointsNames = previousCallingPoints[i].locationName;
-                    var previousCallingPointsDepartTime = previousCallingPoints[i].st;
-                    var previousCallingPointsEstimatedDepartTime = previousCallingPoints[i].et
-                    var previousCallingPointsActualDepartTime = previousCallingPoints[i].at;
+                    console.log(previousCallingPoints[i])
 
-                    if (previousCallingPointsEstimatedDepartTime === null) {
-                        var previousCallingPointsStatus = previousCallingPointsActualDepartTime;
+                    // get the station name and code, as well as depart time, estimated depart time and actual depart time
+                    var previousCallingPointStationName = previousCallingPoints[i].locationName,
+                        previousCallingPointStationCode = previousCallingPoints[i].crs,
+                        previousCallingPointStationScheduledDepartTime = previousCallingPoints[i].st,
+                        previousCallingPointStationEstimatedDepartTime = previousCallingPoints[i].et,
+                        previousCallingPointStationActualDepartTime = previousCallingPoints[i].at;
 
-                    } else if (previousCallingPointsActualDepartTime === null) {
-                        var previousCallingPointsStatus = previousCallingPointsEstimatedDepartTime;
+                    // if object is equal to null
+                    if (previousCallingPointStationEstimatedDepartTime === null) {
+
+                        // switch variable to other object
+                        var previousCallingPointStationDepartStatus = previousCallingPointStationActualDepartTime;
+
+                        // if object is equal to null
+                    } else if (previousCallingPointStationActualDepartTime === null) {
+
+                        // switch variable to other object
+                        var previousCallingPointStationDepartStatus = previousCallingPointStationEstimatedDepartTime;
+
                     }
 
-                    if(previousCallingPointsEstimatedDepartTime === "On time" || previousCallingPointsActualDepartTime === "On time") {
+                    // if statement to add certain class depending on whether status is on time, delayed or cancelled
+                    // if either variable values are equal to "ontime"
+                    if (previousCallingPointStationEstimatedDepartTime === "On time" || previousCallingPointStationActualDepartTime === "On time") {
 
-                        var previousDepartAndStatus = "<span class='depart-time'>" + previousCallingPointsDepartTime + "</span><span class='expected-departure ontime'> " + previousCallingPointsStatus +"</span></span>";
-                    
-                    } else if (previousCallingPointsDepartTime !== "On time") {
-                        var previousDepartAndStatus = "<span class='depart-time strikethrough-small'>" + previousCallingPointsDepartTime + "</span><span class='expected-departure delayed'> " + previousCallingPointsStatus +"</span></span>";
+                        // template for status and depart time
+                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure ontime'> " + previousCallingPointStationDepartStatus + "</span></span>";
+
+                    } else if (previousCallingPointStationEstimatedDepartTime !== "On time" && previousCallingPointStationEstimatedDepartTime !== "Cancelled") {
+
+                        // template for status and depart time
+                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure delayed'> " + previousCallingPointStationDepartStatus + "</span></span>";
+
+                    } else if (previousCallingPointStationEstimatedDepartTime === "Cancelled") {
+
+                        // template for status and depart time
+                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure cancelled'> " + previousCallingPointStationDepartStatus + "</span></span>";
 
                     }
 
-                    var previousCallingPointElement = "<span class='calling-point'>" + previousCallingPointsNames + "</span>" +
-                        "<span class='calling-point-info'>" + previousDepartAndStatus;
+                    // template for each calling point
+                    var previousCallingPointStationTemplate =
+                        "<span class='calling-point'>" + previousCallingPointStationName + "</span>" +
+                        "<span class='calling-point-info'>" + previousCallingPointStationDepartStatusTemplate;
 
-                    // push previous calling points in to array
-                    callingPointsArr.push(previousCallingPointElement);
+                    // push each calling point template in to an array
+                    callingPointsArray.push(previousCallingPointStationTemplate);
+
                 }
 
-                // variables for current station information
-                var currentStationCode = res.crs;
-                var currentStationName = res.locationName;
-                var currentStationDepartTime = res.std;
-                var currentStationEstimated = res.etd;
-                var currentStationActualDepartTime = res.atd;
-                var serviceCancelled = res.isCancelled;
-                var delayReason = res.delayReason;
-                var cancelReason = res.cancelReason;
+                // current station calling point
+                // variables for required information
+                var currentCallingPointStationName = res.locationName,
+                    currentCallingPointStationCode = res.crs,
+                    currentCallingPointStationScheduledDepartTime = res.std,
+                    currentCallingPointStationEstimatedDepartTime = res.etd,
+                    currentCallingPointStationActualDepartTime = res.atd,
+                    currentCallingPointStationIsServiceCancelled = res.isCancelled,
+                    currentCallingPointStationServiceDelayReason = res.delayReason,
+                    currentCallingPointStationServiceCancelledReason = res.cancelReason;
 
-                // declare service info element
+                // serviceInfo element
                 var serviceInfo = document.querySelector(".service-info");
 
-                // check if service is cancelled
-                if (serviceCancelled === false) {
-                    console.log("not cancelled")
-                } else if (serviceCancelled !== false) {
-                    console.log("is cancelled");
-                }
+                // if statement to check if service is delayed, cancelled or running on time
+                // if there is no delay reason, the service is not cancelled but it is not estimated to be on time
+                if (currentCallingPointStationServiceDelayReason === null && currentCallingPointStationIsServiceCancelled === false && currentCallingPointStationEstimatedDepartTime !== "On time") {
 
-                // if there is no reason for delay, service is not cancelled and the depart time from station is not "On time"
-                if (delayReason === null && serviceCancelled === false && currentStationEstimated !== "On time") {
-                    
-                    // insert reason why it is delayed
+                    // insert delay reason in to element
                     serviceInfo.innerHTML = "This service is running with delays";
 
-                // if the delay reason object is not null and service is not cancelled
-                } else if (delayReason !== null && serviceCancelled === false) {
-                    
-                    // insert reason for delay in service info container
-                    serviceInfo.innerHTML = delayReason;
+                    // if there is a delay reason but the service is not cancelled
+                } else if (currentCallingPointStationServiceDelayReason !== null && currentCallingPointStationIsServiceCancelled === false) {
 
-                // if the estimated depart time is "on time"
-                } else if (currentStationEstimated === "On time") {
+                    // insert delay reason in to element
+                    serviceInfo.innerHTML = currentCallingPointStationServiceDelayReason;
 
-                    // insert reason for delay in service info container
+                    // if estimated depart time equals on time
+                } else if (currentCallingPointStationEstimatedDepartTime === "On time") {
+
+                    // insert reason in to element
                     serviceInfo.innerHTML = "This service is running to schedule";
 
-                // if the service is cancelled
-                } else if (serviceCancelled === true) {
+                    // if service has been cancelled
+                } else if (currentCallingPointStationIsServiceCancelled === true) {
 
-                    // insert reason for cancelled service
-                    serviceInfo.innerHTML = cancelReason;
+                    // insert delay reason in to element
+                    serviceInfo.innerHTML = currentCallingPointStationServiceCancelledReason;
 
-                // if service is cancelled but there is no reason why
-                } else if (serviceCancelled === true && cancelReason === null) {
+                    // if service has been cancelled but there is no reason
+                } else if (currentCallingPointStationIsServiceCancelled === true && currentCallingPointStationServiceCancelledReason === null) {
 
                     // insert reason for delay in service info container
                     serviceInfo.innerHTML = "This service has been cancelled";
 
                 }
 
-                // if variable is null
-                if (currentStationEstimated === null) {
+                // if object is equal to null
+                if (currentCallingPointStationEstimatedDepartTime === "null") {
 
-                    // declare variable
-                    var currentStationStatus = currentStationActualDepartTime;
-                } else if (currentStationActualDepartTime === null) {
-                    // declare variable
-                    var currentStationStatus = currentStationEstimated;
+                    // switch variable to other object
+                    var currentCallingPointStationDepartStatus = previousCallingPointStationActualDepartTime;
+
+                    // if object is equal to null
+                } else if (currentCallingPointStationActualDepartTime === null) {
+
+                    // switch variable to other object
+                    var currentCallingPointStationDepartStatus = currentCallingPointStationEstimatedDepartTime;
+
                 }
 
-                if(currentStationEstimated === "On time") {
+                // if statement to add certain class depending on whether status is on time, delayed or cancelled
+                // if either variable values are equal to "ontime"
+                if (currentCallingPointStationEstimatedDepartTime === "On time" || currentCallingPointStationActualDepartTime === "On time") {
 
-                        var currentDepartAndStatus = "<span class='depart-time'>" + currentStationDepartTime + "</span><span class='expected-departure ontime'> " + currentStationStatus +"</span></span>";
-                    
-                    } else if (currentStationEstimated !== "On time") {
+                    // template for status and depart time
+                    var currentCallingPointStationDepartStatusTemplate = "<span class='depart-time'>" + currentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure ontime'> " + currentCallingPointStationDepartStatus + "</span></span>";
 
-                        var currentDepartAndStatus = "<span class='depart-time'>" + currentStationDepartTime + "</span><span class='expected-departure delayed'> " + currentStationStatus +"</span></span>";
+                } else if (currentCallingPointStationEstimatedDepartTime !== "On time" && currentCallingPointStationEstimatedDepartTime !== "Cancelled") {
 
-                    }
+                    // template for status and depart time
+                    var currentCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + currentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure delayed'> " + currentCallingPointStationDepartStatus + "</span></span>";
 
-                // template for current calling point
-                var currentCallingPointElement = "<span class='calling-point'>" + currentStationName + "</span>" +
-                    "<span class='calling-point-info'>" + currentDepartAndStatus;
+                } else if (currentCallingPointStationEstimatedDepartTime === "Cancelled") {
 
-                // push to array
-                callingPointsArr.push(currentCallingPointElement);
+                    // template for status and depart time
+                    var currentCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + currentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure cancelled'> " + currentCallingPointStationDepartStatus + "</span></span>";
 
-                // loop through calling points object
+                }
+
+
+                // template for each calling point
+                var currentCallingPointStationTemplate =
+                    "<span class='calling-point'>" + currentCallingPointStationName + "</span>" +
+                    "<span class='calling-point-info'>" + currentCallingPointStationDepartStatusTemplate;
+
+                // push each calling point template in to an array
+                callingPointsArray.push(currentCallingPointStationTemplate);
+
+                // loop through the subsequentCallingPoints object
                 for (var i = 0; i < subsequentCallingPoints.length; i++) {
 
-                    // variables for subsequent calling points info
-                    var subsequentCallingPointsNames = subsequentCallingPoints[i].locationName;
-                    var subsequentCallingPointsDepartTime = subsequentCallingPoints[i].st;
-                    var subsequentCallingPointsEstimatedDepartTime = subsequentCallingPoints[i].et;
-                    var subsequentCallingPointsActualDepartTime = subsequentCallingPoints[i].at;
+                    // get the station name and code, as well as depart time, estimated depart time and actual depart time
+                    var subsequentCallingPointStationName = subsequentCallingPoints[i].locationName,
+                        subsequentCallingPointStationCode = subsequentCallingPoints[i].crs,
+                        subsequentCallingPointStationScheduledDepartTime = subsequentCallingPoints[i].st,
+                        subsequentCallingPointStationEstimatedDepartTime = subsequentCallingPoints[i].et,
+                        subsequentCallingPointStationActualDepartTime = subsequentCallingPoints[i].at;
 
-                    // if variable is null
-                    if (subsequentCallingPointsEstimatedDepartTime === null) {
+                    // if object is equal to null
+                    if (subsequentCallingPointStationScheduledDepartTime === null) {
 
-                        // declare variable
-                        var subsequentCallingPointsStatus = subsequentCallingPointsActualDepartTime;
-                    } else if (subsequentCallingPointsActualDepartTime === null) {
+                        // switch variable to other object
+                        var subsequentCallingPointStationDepartStatus = subsequentCallingPointStationActualDepartTime;
 
-                        // declare variable
-                        var subsequentCallingPointsStatus = subsequentCallingPointsEstimatedDepartTime;
-                    }
+                        // if object is equal to null
+                    } else if (subsequentCallingPointStationActualDepartTime === null) {
 
-                    if(subsequentCallingPointsEstimatedDepartTime === "On time") {
-
-                        var subsequentDepartAndStatus = "<span class='depart-time'>" + subsequentCallingPointsDepartTime + "</span><span class='expected-departure ontime'> " + subsequentCallingPointsStatus +"</span></span>";
-                    
-                    } else if (subsequentCallingPointsDepartTime !== "On time") {
-                        var subsequentDepartAndStatus = "<span class='depart-time'>" + subsequentCallingPointsDepartTime + "</span><span class='expected-departure delayed'> " + subsequentCallingPointsStatus +"</span></span>";
+                        // switch variable to other object
+                        var subsequentCallingPointStationDepartStatus = subsequentCallingPointStationEstimatedDepartTime;
 
                     }
 
-                    // var subsequentDepartAndStatus = "<span class='depart-time'>" + subsequentCallingPointsDepartTime + "</span><span class='expected-departure'> " + subsequentCallingPointsStatus +"</span></span>";
+                    // if statement to add certain class depending on whether status is on time, delayed or cancelled
+                    // if either variable values are equal to "ontime"
+                    if (subsequentCallingPointStationEstimatedDepartTime === "On time" || subsequentCallingPointStationActualDepartTime === "On time") {
 
-                    // template for subsequent calling points
-                    var subsequentCallingPointElement = "<span class='calling-point'>" + subsequentCallingPointsNames + "</span>" +
-                        "<span class='calling-point-info'>" + subsequentDepartAndStatus;
+                        // template for status and depart time
+                        var subsequentCallingPointStationDepartStatusTemplate = "<span class='depart-time'>" + subsequentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure ontime'> " + subsequentCallingPointStationDepartStatus + "</span></span>";
 
-                    // log to console
-                    // console.log(subsequentCallingPointElement)
+                    } else if (subsequentCallingPointStationEstimatedDepartTime !== "On time" && subsequentCallingPointStationEstimatedDepartTime !== "Cancelled") {
+                        
+                        // template for status and depart time
+                        var subsequentCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + subsequentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure delayed'> " + subsequentCallingPointStationDepartStatus + "</span></span>";
 
-                    // push to array
-                    callingPointsArr.push(subsequentCallingPointElement);
+                    } else if (subsequentCallingPointStationEstimatedDepartTime === "Cancelled") {
+                        
+                        // template for status and depart time
+                        var subsequentCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + subsequentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure cancelled'> " + subsequentCallingPointStationDepartStatus + "</span></span>";
+
+                    }
+
+
+                    // template for each calling point
+                    var subsequentCallingPointStationTemplate =
+                        "<span class='calling-point'>" + subsequentCallingPointStationName + "</span>" +
+                        "<span class='calling-point-info'>" + subsequentCallingPointStationDepartStatusTemplate;
+
+                    // push each calling point template in to an array
+                    callingPointsArray.push(subsequentCallingPointStationTemplate);
 
                 }
 
-                // declare callingPoints variable
-                var callingPoints = document.querySelectorAll("calling-point");
 
-                // log to console
-                // console.log(callingPointsArr);
 
-                // insert station code and full stationname of elements 
-                currentStationElement.innerHTML = currentStationCode;
+
+
+
+
+
+
+                // create variables for elements
+                var currentStationElement = document.querySelector(".current-station");
+                var destinationStationElement = document.querySelector(".destination-station");
+                var currentStationFullElement = document.querySelector(".current-station-full");
+                var destinationStationFullElement = document.querySelector(".destination-station-full");
+                var callingPointsContainer = document.querySelector(".calling-points-container");
+
+
+                currentStationElement.innerHTML = currentCallingPointStationCode;
+                currentStationFullElement.innerHTML = currentCallingPointStationName;
                 destinationStationElement.innerHTML = destinationStationCode;
-                currentStationFullElement.innerHTML = currentStationName;
                 destinationStationFullElement.innerHTML = destinationStationName;
                 callingPointsContainer.innerHTML = ""
-                callingPointsContainer.innerHTML += callingPointsArr.join("");
+                callingPointsContainer.innerHTML += callingPointsArray.join("");
 
                 serviceWindow.classList.remove("hidden");
                 serviceWindowContainer.classList.remove("hidden");

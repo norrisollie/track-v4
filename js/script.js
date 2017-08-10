@@ -76,17 +76,14 @@ window.onload = function() {
                             "<span class='station-name'><img class='nr-logo' src='assets/images/nr.svg'>" + name + "</span>" +
                             "<div class='location-distance'>This station is <span class='distance'>" + distanceKilometres + "</span> away from your location</div></div>" +
                             "<div class='service-container' data-stationcode=" + code + ">" +
-
                             "</div>" +
                             "</div>";
 
                         // insert stationTemplate element in to resultsWindow element
+                        // resultsWindow.innerHTML = "";
                         resultsWindow.innerHTML += stationTemplate;
 
                     }
-
-                    // log to console
-                    // console.log(departuresUrlArray);
 
                     // loop to go throught departuresUrlArray
                     for (var i = 0; i < departuresUrlArray.length; i++) {
@@ -129,7 +126,12 @@ window.onload = function() {
                                     if (serviceVia === null) {
 
                                         // replace with empty string
-                                        var serviceVia = "";
+                                        var serviceViaTemplate = "<div class='service-row row-via'><span class='via via-null'></span></div>";
+
+                                    } else if (serviceVia !== null) {
+
+                                        var serviceViaTemplate = "<div class='service-row row-via'><span class='via'>" + serviceVia + "</span></div>";
+
                                     }
 
                                     // remove null if platform is null
@@ -165,9 +167,6 @@ window.onload = function() {
                                         var status = "<span class='status delayed'> Delayed " + departureTimeExpected + "</span>";
                                     }
 
-                                    // log to console
-                                    // console.log("Dest: " + destinationName + " " + serviceVia + " | Dep: " + departureTime + " | Status: " + departureTimeExpected + " | Platform: " + platform + " | Operator: " + operator);
-
                                     var serviceBoxTemplate =
 
                                         "<div class='service-box' data-currentcrs='" + currentStationCode + "' data-serviceid='" + serviceID + "''>" +
@@ -175,27 +174,27 @@ window.onload = function() {
                                         status +
                                         platform + "</span></div>" +
                                         "<div class='service-row row-destination'><span class='destination'>" + destinationName + "</span></div>" +
-                                        "<div class='service-row row-via'><span class='via'>" + serviceVia + "</span></div>" +
+                                        serviceViaTemplate +
                                         "<div class='service-row row-operator'><span class='operator'>Operated by <span class='operator-name'>" + operator + "</span></span></div>" +
                                         "</div>"
 
                                     // declare serviceContainer element
                                     var serviceContainer = document.querySelectorAll(".service-container");
 
-                                    // serviceContainer[0].innerHTML += serviceBoxTemplate;
-
                                     // inserts correct service in to correct station element based on matching codes
                                     var currentWrapper = [...serviceContainer].find((wrapper) => wrapper.dataset.stationcode === currentStationCode);
                                     var serviceBoxFragment = document.createRange().createContextualFragment(serviceBoxTemplate);
 
+                                    var serviceBoxFinding = document.querySelectorAll(".service-box-finding");
                                     // add to correct element
+                                    // currentWrapper.removeChild(serviceBoxFinding)
+
+                                    // currentWrapper.removeChild(serviceBoxFinding);
                                     currentWrapper.appendChild(serviceBoxFragment);
                                 }
 
                                 // declare serviceBox variable
                                 var serviceBox = document.querySelectorAll(".service-box");
-
-
 
                                 // loop through serviceBox elements
                                 for (var i = 0; i < serviceBox.length; i++) {
@@ -203,8 +202,6 @@ window.onload = function() {
                                     serviceBox[i].addEventListener("click", serviceBoxClick);
 
                                 }
-
-
 
                             } else {
                                 // We reached our target server, but it returned an error
@@ -216,28 +213,19 @@ window.onload = function() {
 
                         };
 
-
-
                         serviceReq.onerror = function() {
                             // There was a connection error of some sort
                         };
 
-
                         serviceReq.send();
-
-
 
                     }
 
-
                 } else {
                     // We reached our target server, but it returned an error
-
                 }
 
             };
-
-
 
             nearestStationsReq.onerror = function() {
                 // There was a connection error of some sort
@@ -245,12 +233,7 @@ window.onload = function() {
 
             nearestStationsReq.send();
 
-
-
-
         });
-
-
 
     } else {
 
@@ -299,9 +282,6 @@ window.onload = function() {
             target = e.target,
             // nr key
             nrKey = "c8eebaa7-d421-4025-bb02-989cc9c53b39";
-
-        // var theBody = document.querySelector("body")
-        // theBody.classList.add("body-no-scroll");
 
         // log to console
         console.log(target)
@@ -380,12 +360,12 @@ window.onload = function() {
                     if (previousCallingPointStationEstimatedDepartTime === "On time" || previousCallingPointStationActualDepartTime === "On time") {
 
                         // template for status and depart time
-                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure ontime'> " + previousCallingPointStationDepartStatus + "</span></span>";
+                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure ontime'>" + previousCallingPointStationDepartStatus + "</span></span>";
 
                     } else if (previousCallingPointStationEstimatedDepartTime !== "On time" && previousCallingPointStationEstimatedDepartTime !== "Cancelled") {
 
                         // template for status and depart time
-                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure delayed'> " + previousCallingPointStationDepartStatus + "</span></span>";
+                        var previousCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + previousCallingPointStationScheduledDepartTime + "</span><span class='expected-departure delayed'>" + previousCallingPointStationDepartStatus + "</span></span>";
 
                     } else if (previousCallingPointStationEstimatedDepartTime === "Cancelled") {
 
@@ -408,6 +388,7 @@ window.onload = function() {
                 // variables for required information
                 var currentCallingPointStationName = res.locationName,
                     currentCallingPointStationCode = res.crs,
+                    currentCallingPointStationPlatform = res.platform,
                     currentCallingPointStationScheduledDepartTime = res.std,
                     currentCallingPointStationEstimatedDepartTime = res.etd,
                     currentCallingPointStationActualDepartTime = res.atd,
@@ -525,12 +506,12 @@ window.onload = function() {
                         var subsequentCallingPointStationDepartStatusTemplate = "<span class='depart-time'>" + subsequentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure ontime'> " + subsequentCallingPointStationDepartStatus + "</span></span>";
 
                     } else if (subsequentCallingPointStationEstimatedDepartTime !== "On time" && subsequentCallingPointStationEstimatedDepartTime !== "Cancelled") {
-                        
+
                         // template for status and depart time
                         var subsequentCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + subsequentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure delayed'> " + subsequentCallingPointStationDepartStatus + "</span></span>";
 
                     } else if (subsequentCallingPointStationEstimatedDepartTime === "Cancelled") {
-                        
+
                         // template for status and depart time
                         var subsequentCallingPointStationDepartStatusTemplate = "<span class='depart-time strikethrough-small'>" + subsequentCallingPointStationScheduledDepartTime + "</span><span class='expected-departure cancelled'> " + subsequentCallingPointStationDepartStatus + "</span></span>";
 

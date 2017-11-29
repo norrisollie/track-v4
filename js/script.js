@@ -5,6 +5,15 @@ if (window.location.protocol != 'https:') {
     window.location.protocol = 'https';
 }
 
+function getPlatform(platform) {
+    // remove null if platform is null
+    if (platform === null) {
+        return "<span class='platform unavailable'>Plat. n/a</span>";
+    } else {
+        return "<span class='platform'>Plat. " + platform + "</span>"
+    }
+}
+
 // run when page has fully loaded
 window.onload = function() {
 
@@ -135,16 +144,9 @@ window.onload = function() {
                                     }
 
                                     // remove null if platform is null
-                                    if (platform === null) {
+                                    var platform = getPlatform(platform)
 
-                                        // replace with string
-                                        var platform = "<span class='platform unavailable'>Plat. n/a</span>";
-
-                                    } else if (platform !== null) {
-
-                                        var platform = "<span class='platform'>Plat. " + platform + "</span>"
-
-                                    }
+                                    
 
                                     // if statement to add specific classes depending on status
                                     if (departureTimeExpected === "On time") {
@@ -176,20 +178,18 @@ window.onload = function() {
                                         "<div class='service-row row-destination'><span class='destination'>" + destinationName + "</span></div>" +
                                         serviceViaTemplate +
                                         "<div class='service-row row-operator'><span class='operator'>Operated by <span class='operator-name'>" + operator + "</span></span></div>" +
-                                        "</div>"
+                                        "</div>";
 
                                     // declare serviceContainer element
                                     var serviceContainer = document.querySelectorAll(".service-container");
 
                                     // inserts correct service in to correct station element based on matching codes
                                     var currentWrapper = [...serviceContainer].find((wrapper) => wrapper.dataset.stationcode === currentStationCode);
+
                                     var serviceBoxFragment = document.createRange().createContextualFragment(serviceBoxTemplate);
 
                                     var serviceBoxFinding = document.querySelectorAll(".service-box-finding");
-                                    // add to correct element
-                                    // currentWrapper.removeChild(serviceBoxFinding)
 
-                                    // currentWrapper.removeChild(serviceBoxFinding);
                                     currentWrapper.appendChild(serviceBoxFragment);
                                 }
 
